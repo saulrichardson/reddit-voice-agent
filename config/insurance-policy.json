@@ -1,0 +1,28 @@
+{
+  "id": "insurance-lead-us-v1",
+  "description": "Baseline conversation policy for inbound/outbound insurance lead handling.",
+  "requiredAgentRegex": [
+    {
+      "id": "ai_disclosure",
+      "regex": "\\b(ai assistant|virtual assistant|automated assistant)\\b"
+    }
+  ],
+  "forbiddenAgentRegex": [
+    {
+      "id": "guaranteed_outcome",
+      "regex": "\\bguaranteed (coverage|approval|rate|premium)\\b"
+    },
+    {
+      "id": "bind_without_human",
+      "regex": "\\b(i can|we can) bind (your )?coverage right now\\b"
+    }
+  ],
+  "dncUserRegex": [
+    "\\bdo not call\\b",
+    "\\bremove me from (your )?list\\b",
+    "\\bstop calling\\b"
+  ],
+  "dncAgentAcknowledgeRegex": "\\b(remove|adding).*(do not call|dnc)|\\bwon'?t call again\\b",
+  "maxAgentTurnsAfterDnc": 1,
+  "requiredToolOnDnc": "set_do_not_call"
+}

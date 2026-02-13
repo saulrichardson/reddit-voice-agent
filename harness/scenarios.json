@@ -1,0 +1,103 @@
+[
+  {
+    "id": "outbound-qualified-handoff",
+    "description": "Agent introduces itself, qualifies lead, and hands off with consent.",
+    "traceFile": "traces/outbound-qualified.json",
+    "requiredSequence": [
+      {
+        "label": "AI disclosure",
+        "speaker": "agent",
+        "regex": "\\b(ai assistant|virtual assistant|automated assistant)\\b"
+      },
+      {
+        "label": "Reason for call",
+        "speaker": "agent",
+        "regex": "\\b(auto insurance|insurance options|policy options)\\b"
+      },
+      {
+        "label": "Collect qualification detail",
+        "speaker": "agent",
+        "regex": "\\b(zip code|postcode)\\b"
+      },
+      {
+        "label": "Licensed handoff framing",
+        "speaker": "agent",
+        "regex": "\\blicensed agent\\b"
+      }
+    ],
+    "forbiddenAgentRegex": [
+      "\\bguaranteed (coverage|approval|rate|premium)\\b"
+    ],
+    "requiredToolCalls": [
+      {
+        "name": "upsert_lead",
+        "requiredArgs": ["phoneE164", "product"]
+      },
+      {
+        "name": "handoff_to_licensed_agent",
+        "requiredArgs": ["phoneE164", "consentToTransfer", "reason"]
+      }
+    ]
+  },
+  {
+    "id": "dnc-request",
+    "description": "Prospect requests do-not-call and agent must stop with one acknowledgment.",
+    "traceFile": "traces/dnc-request.json",
+    "requiredSequence": [
+      {
+        "label": "AI disclosure",
+        "speaker": "agent",
+        "regex": "\\b(ai assistant|virtual assistant|automated assistant)\\b"
+      },
+      {
+        "label": "DNC acknowledgment",
+        "speaker": "agent",
+        "regex": "\\b(remove|do not call|won'?t call again)\\b"
+      }
+    ],
+    "forbiddenAgentRegex": [
+      "\\bif you just answer one more question\\b"
+    ],
+    "requiredToolCalls": [
+      {
+        "name": "set_do_not_call",
+        "requiredArgs": ["phoneE164", "reason", "source"]
+      }
+    ]
+  },
+  {
+    "id": "inbound-callback-booking",
+    "description": "Inbound lead asks for quote; agent captures basics and books callback.",
+    "traceFile": "traces/inbound-callback.json",
+    "requiredSequence": [
+      {
+        "label": "AI disclosure",
+        "speaker": "agent",
+        "regex": "\\b(ai assistant|virtual assistant|automated assistant)\\b"
+      },
+      {
+        "label": "No binding claim",
+        "speaker": "agent",
+        "regex": "\\b(can'?t|cannot) bind coverage\\b"
+      },
+      {
+        "label": "Collect callback preference",
+        "speaker": "agent",
+        "regex": "\\b(best time\\b|callback)"
+      }
+    ],
+    "forbiddenAgentRegex": [
+      "\\bwe can finalize this policy right now\\b"
+    ],
+    "requiredToolCalls": [
+      {
+        "name": "upsert_lead",
+        "requiredArgs": ["phoneE164", "product"]
+      },
+      {
+        "name": "schedule_callback",
+        "requiredArgs": ["phoneE164", "callbackIso", "timezone"]
+      }
+    ]
+  }
+]

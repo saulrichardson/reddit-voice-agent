@@ -1,0 +1,59 @@
+{
+  "conversationId": "conv-outbound-001",
+  "direction": "outbound",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "Hi, this is Maya, an automated assistant with Harbor Insurance. I can collect a few details, and then a licensed agent can give your final options."
+    },
+    {
+      "speaker": "prospect",
+      "text": "Okay, what is this about?"
+    },
+    {
+      "speaker": "agent",
+      "text": "I am reaching out because you recently asked about auto insurance options. Is now still a good time for two quick questions?"
+    },
+    {
+      "speaker": "prospect",
+      "text": "Sure."
+    },
+    {
+      "speaker": "agent",
+      "text": "Great. What zip code is your primary vehicle garaged in?"
+    },
+    {
+      "speaker": "prospect",
+      "text": "90017"
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks. A licensed agent can call you within 15 minutes to review actual pricing. Is it okay to connect you now?"
+    },
+    {
+      "speaker": "prospect",
+      "text": "Yes, that works."
+    }
+  ],
+  "toolCalls": [
+    {
+      "name": "upsert_lead",
+      "args": {
+        "phoneE164": "+12135550101",
+        "firstName": "Jordan",
+        "zipCode": "90017",
+        "product": "auto",
+        "consentToContact": true
+      }
+    },
+    {
+      "name": "handoff_to_licensed_agent",
+      "args": {
+        "phoneE164": "+12135550101",
+        "product": "auto",
+        "consentToTransfer": true,
+        "reason": "Qualified outbound lead requested immediate transfer"
+      }
+    }
+  ]
+}

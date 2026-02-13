@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Diagram | Voice Agent Lab</title>
+    <meta name="description" content="End-to-end system diagram for the Reddit podcast generator pipeline." />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/site.css" />
+    <link rel="stylesheet" href="/system/system.css" />
+  </head>
+  <body>
+    <div class="bg-veil" aria-hidden="true"></div>
+
+    <header class="top-nav">
+      <a class="brand" href="/">Voice Agent Lab</a>
+      <nav class="nav-links">
+        <a href="/podcast/">Podcast</a>
+        <a href="/system/">System</a>
+      </nav>
+    </header>
+
+    <main class="site-shell">
+      <section class="hero hero--compact reveal">
+        <h1 class="hero__title">System diagrams</h1>
+        <p class="hero__lede">
+          A concrete pipeline: seed thread URL → scrape + normalize → persona research → script generation → voice
+          render → mix → publish → website playback. The public UI reads from <span class="mono">/api/episodes</span>.
+        </p>
+      </section>
+
+      <section class="diagram-wrap reveal">
+        <article class="card card--wide diagram-card">
+          <h2>End-to-end workflow</h2>
+          <div class="mermaid">
+flowchart LR
+  A["Seed Reddit thread URL"] --> B["Scrape post + full comment tree"]
+  B --> R1["seed-thread.raw.json"]
+  B --> R2["seed-thread.tree.json"]
+  B --> R3["seed-thread.normalized.json"]
+
+  R3 --> C["Research agent optional<br/>web search + artifact capture"]
+  C --> C2["persona-pack.json"]
+
+  R3 --> D["Writer room planner_agents<br/>sequential reply-linked turns"]
+  C2 --> D
+  D --> S1["script.json<br/>lineId speaker respondsToLineId timing"]
+  D --> S2["script.txt"]
+
+  S1 --> T["TTS ElevenLabs<br/>per-line render"]
+  T --> ST["stems/*.mp3"]
+  ST --> M["Mix with overlap rules"]
+  M --> OUT["episode-mix.mp3"]
+
+  subgraph DEV["Local mode EPISODES_STORE fs"]
+    OUT --> L1["output/episodes/{episodeId}/"]
+    L1 --> LE["/local-episodes/{episodeId}/{file}"]
+    LE --> API1["/api/episodes from FS"]
+  end
+
+  subgraph PROD["Production mode EPISODES_STORE postgres"]
+    OUT --> P1["Upload to S3<br/>audio + artifacts"]
+    P1 --> P2["Index in Neon<br/>podcast_episodes table"]
+    P2 --> API2["/api/episodes from Postgres"]
+  end
+
+  API1 --> UI["Website UI /podcast/"]
+  API2 --> UI
+          </div>
+        </article>
+      </section>
+
+      <section class="diagram-wrap reveal">
+        <article class="card card--wide diagram-card">
+          <h2>Podcast generator architecture</h2>
+          <p>
+            Conversation quality comes from explicit turn planning, reply targeting, and controlled interjections
+            before rendering.
+          </p>
+          <div class="mermaid">
+flowchart TB
+  IN1["Seed artifacts<br/>normalized thread + persona pack"] --> CTX["Context builder"]
+  CTX --> PLAN["Planner<br/>beats + speaking goals"]
+  PLAN --> SCH["Turn scheduler<br/>who speaks next and why"]
+
+  subgraph AGENTS["Persona agent pool"]
+    HOST["Host agent"]
+    POST["Post reader agent"]
+    COMM["Comment reader agent"]
+    PANA["Panelist A agent"]
+    PANB["Panelist B agent"]
+  end
+
+  SCH --> HOST
+  SCH --> POST
+  SCH --> COMM
+  SCH --> PANA
+  SCH --> PANB
+
+  HOST --> CAND["Candidate proposals<br/>text + intent + reply target"]
+  POST --> CAND
+  COMM --> CAND
+  PANA --> CAND
+  PANB --> CAND
+
+  CAND --> ARB["Turn arbiter<br/>coherence timing anti-talkover"]
+  ARB --> INT["Interjection lane<br/>short overlap comments only"]
+  INT --> DIR["Performance director<br/>pace emphasis energy"]
+  ARB --> DIR
+
+  DIR --> SCR["Script compiler<br/>lineId speaker respondsToLineId startMs"]
+  SCR --> VOX["Voice renderer ElevenLabs"]
+  VOX --> MIX["Mixer<br/>ducking overlaps spacing"]
+  MIX --> OUT2["Final episode mix + artifacts"]
+          </div>
+        </article>
+      </section>
+
+      <section class="grid reveal" aria-label="Notes">
+        <article class="card">
+          <h2>Why sequential turns?</h2>
+          <p>
+            The writer generates one speaker line at a time with a reply target. That forces “actual responding”
+            behavior instead of everybody free-associating.
+          </p>
+          <div class="card__meta">
+            <span class="tag">respondsToLineId</span>
+            <span class="tag">turn arbitration</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Why save artifacts?</h2>
+          <p>
+            Debuggability. You can open the raw scrape, verify what was selected as “sources,” and trace every
+            rendered line back to a script and seed.
+          </p>
+          <div class="card__meta">
+            <span class="tag">sources.json</span>
+            <span class="tag">seed-thread.*.json</span>
+          </div>
+        </article>
+
+        <article class="card card--wide">
+          <h2>Serving strategy</h2>
+          <p>
+            Local dev serves files directly from disk at <span class="mono">/local-episodes</span>. Production should
+            publish files to object storage (S3/CloudFront) and store URLs in Postgres, so the web app can run
+            statelessly (Vercel/AWS).
+          </p>
+          <div class="card__meta">
+            <span class="tag">S3</span>
+            <span class="tag">Neon</span>
+            <span class="tag">Vercel</span>
+          </div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Mermaid is rendered client-side. If it doesn’t display, check your browser console and confirm you can load
+          the Mermaid ESM bundle.
+        </p>
+      </footer>
+    </main>
+
+    <script type="module" src="/site.js"></script>
+    <script type="module" src="/system/app.js"></script>
+  </body>
+</html>

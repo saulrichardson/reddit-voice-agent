@@ -1,0 +1,23 @@
+.diagram-wrap {
+  margin-top: 16px;
+}
+
+.diagram-card {
+  overflow: auto;
+}
+
+.diagram-card .mermaid {
+  min-width: 820px;
+}
+
+.diagram-card svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 900px) {
+  .diagram-card .mermaid {
+    min-width: 740px;
+  }
+}
+

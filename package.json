@@ -1,0 +1,38 @@
+{
+  "name": "voice-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "harness:run": "tsx src/harness/runHarness.ts",
+    "check": "npm run test && npm run harness:run",
+    "podcast:list-voices": "tsx src/podcast/listVoices.ts",
+    "podcast:build": "tsx src/podcast/runEpisode.ts",
+    "podcast:benchmark": "tsx src/podcast/benchmarkBanter.ts",
+    "podcast:test-conversation": "tsx src/podcast/testConversationArchitecture.ts",
+    "podcast:test-overlap-mix-local": "tsx src/podcast/testOverlapMixLocal.ts",
+    "podcast:research-persona": "tsx src/podcast/runPersonaResearch.ts",
+    "reddit:scrape": "tsx src/podcast/scrapeSeedThread.ts",
+    "site:migrate": "tsx src/site/migrate.ts",
+    "site:publish-episode": "tsx src/site/publishEpisode.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.760.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

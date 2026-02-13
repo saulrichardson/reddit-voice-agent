@@ -1,0 +1,12 @@
+node_modules
+dist
+output/benchmarks
+output/examples
+output/research
+output/scrapes
+.logs
+.run
+.env
+.env.*
+coverage
+*.log

@@ -1,0 +1,28 @@
+{
+  "conversationId": "conv-outbound-002",
+  "direction": "outbound",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "Hi, this is Nora, an AI assistant for Harbor Insurance."
+    },
+    {
+      "speaker": "prospect",
+      "text": "Stop calling me and remove me from your list."
+    },
+    {
+      "speaker": "agent",
+      "text": "Understood. I am adding your number to our do not call list and we won't call again."
+    }
+  ],
+  "toolCalls": [
+    {
+      "name": "set_do_not_call",
+      "args": {
+        "phoneE164": "+12135550102",
+        "source": "verbal_request",
+        "reason": "Prospect requested removal from outbound calls"
+      }
+    }
+  ]
+}

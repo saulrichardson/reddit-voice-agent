@@ -1,0 +1,46 @@
+{
+  "conversationId": "conv-inbound-001",
+  "direction": "inbound",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Harbor Insurance. I am Ava, a virtual assistant. I can gather your details, but I cannot bind coverage; a licensed agent handles final quotes and binding."
+    },
+    {
+      "speaker": "prospect",
+      "text": "I need a home insurance quote."
+    },
+    {
+      "speaker": "agent",
+      "text": "Absolutely. What zip code is the property in, and what is the best time for a callback today?"
+    },
+    {
+      "speaker": "prospect",
+      "text": "Zip is 78701 and call after 4 PM central."
+    },
+    {
+      "speaker": "agent",
+      "text": "Perfect. I will schedule a callback with a licensed agent after 4 PM central."
+    }
+  ],
+  "toolCalls": [
+    {
+      "name": "upsert_lead",
+      "args": {
+        "phoneE164": "+15125550111",
+        "zipCode": "78701",
+        "product": "home",
+        "consentToContact": true
+      }
+    },
+    {
+      "name": "schedule_callback",
+      "args": {
+        "phoneE164": "+15125550111",
+        "callbackIso": "2026-02-09T16:00:00-06:00",
+        "timezone": "America/Chicago",
+        "reason": "Lead requested afternoon callback"
+      }
+    }
+  ]
+}

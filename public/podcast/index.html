@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Podcast Episodes | Voice Agent Lab</title>
+    <meta name="description" content="Listen to generated episodes and inspect scripts/artifacts." />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/site.css" />
+    <link rel="stylesheet" href="/podcast/podcast.css" />
+  </head>
+  <body>
+    <div class="bg-veil" aria-hidden="true"></div>
+
+    <header class="top-nav">
+      <a class="brand" href="/">Voice Agent Lab</a>
+      <nav class="nav-links">
+        <a href="/podcast/">Podcast</a>
+        <a href="/system/">System</a>
+      </nav>
+    </header>
+
+    <main class="site-shell">
+      <section class="hero hero--compact reveal">
+        <h1 class="hero__title">Episodes</h1>
+        <p class="hero__lede">
+          Browse published episodes. Click one to load its audio, script, and artifacts.
+          <span class="mono">/api/episodes</span> powers this page.
+        </p>
+      </section>
+
+      <section class="podcast-layout reveal">
+        <aside class="episodes-panel">
+          <div class="panel-head">
+            <h2>Library</h2>
+            <div class="panel-sub">
+              <span id="storeInfo" class="tag">store: …</span>
+              <span id="countInfo" class="tag">episodes: …</span>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <input id="search" type="search" placeholder="Search by title or subreddit..." />
+          </div>
+
+          <div id="episodesList" class="episodes-list" role="list"></div>
+        </aside>
+
+        <section class="episode-panel">
+          <div id="episodeEmpty" class="empty-state">
+            <h2>Select an episode</h2>
+            <p>
+              Choose an episode on the left. You can deep-link with <span class="mono">?id=&lt;episodeId&gt;</span>.
+            </p>
+          </div>
+
+          <div id="episodeDetail" class="episode-detail" hidden>
+            <div class="episode-detail__head">
+              <div>
+                <h2 id="episodeTitle" class="episode-title"></h2>
+                <p id="episodeMeta" class="episode-meta"></p>
+              </div>
+              <div class="episode-actions">
+                <a id="sourceLink" class="btn btn--ghost" href="#" target="_blank" rel="noreferrer">Source Thread</a>
+                <button id="copyLink" class="btn btn--ghost" type="button">Copy Link</button>
+              </div>
+            </div>
+
+            <div class="player">
+              <audio id="player" controls preload="none"></audio>
+              <div class="player-controls">
+                <button id="prevTrack" class="btn btn--ghost" type="button">Prev</button>
+                <button id="playToggle" class="btn btn--ghost" type="button" aria-pressed="false">Play</button>
+                <div id="trackLabel" class="track-label"></div>
+                <button id="nextTrack" class="btn btn--ghost" type="button">Next</button>
+              </div>
+              <div id="playerStatus" class="player-status" role="status" aria-live="polite"></div>
+              <div id="trackList" class="track-list"></div>
+            </div>
+
+            <details class="details-block" open>
+              <summary>Transcript (script.json)</summary>
+              <div id="transcript" class="transcript"></div>
+            </details>
+
+            <details class="details-block">
+              <summary>Artifacts</summary>
+              <div id="artifacts" class="artifacts"></div>
+            </details>
+          </div>
+        </section>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Episodes are stored either from local disk (<span class="mono">EPISODES_STORE=fs</span>) or from Postgres
+          (<span class="mono">EPISODES_STORE=postgres</span>).
+        </p>
+      </footer>
+    </main>
+
+    <script type="module" src="/site.js"></script>
+    <script type="module" src="/podcast/app.js"></script>
+  </body>
+</html>
