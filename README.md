@@ -2,6 +2,62 @@
 
 This repository provides a production-oriented starter for an insurance lead voice agent using ElevenLabs, with a local harness for behavior and tool-call validation.
 
+## High-level walkthrough
+
+1. Configure environment and providers (`.env`) for OpenAI, ElevenLabs, storage, and database.
+2. Ingest source material:
+   - Insurance mode: run harness scenarios and tool dispatch flows.
+   - Podcast mode: scrape one seed Reddit thread or subreddit listings.
+3. Normalize source artifacts (`sources.json`, seed thread metadata, thread tree).
+4. Optionally run persona research to build speaker profiles from web artifacts.
+5. Generate transcript lines with the writer architecture (single pass, draft/polish, beat sheet, or planner+agents).
+6. Sanitize transcript lines for spoken output and build timing/arbitration timeline.
+7. Render line audio with ElevenLabs and mix episode chunks.
+8. Publish artifacts/audio to S3 + Neon, then serve through `/api/episodes` in the web UI.
+
+## System architecture (end-to-end)
+
+```mermaid
+flowchart LR
+  A["Input source (Insurance call or Reddit seed thread)"] --> B["Ingest + normalize artifacts"]
+  B --> C["Persona research (optional)"]
+  C --> D["Transcript generation"]
+  B --> D
+  D --> E["Transcript sanitization + timeline arbitration"]
+  E --> F["ElevenLabs per-line render + mix"]
+  F --> G["Episode artifacts (script.json, manifest.json, sources.json)"]
+  F --> H["S3 audio objects"]
+  G --> I["Neon episode row (Postgres)"]
+  H --> I
+  I --> J["API layer (/api/episodes, /api/episodes/:id)"]
+  J --> K["Website playback UI (/podcast, /system)"]
+  L["Harness evaluation (/api/harness/evaluate)"] --> M["Policy scoring + tool validation"]
+  M --> N["Scenario traces + CI checks"]
+```
+
+## Podcast conversation generator architecture
+
+```mermaid
+flowchart TD
+  A["Reddit sources + comments"] --> B["Writer room input pack"]
+  P["Persona pack (research runs)"] --> B
+  B --> C["Writer architecture selector"]
+  C --> C1["single_pass"]
+  C --> C2["draft_polish"]
+  C --> C3["beat_sheet_polish"]
+  C --> C4["planner_agents"]
+  C1 --> D["Raw script lines"]
+  C2 --> D
+  C3 --> D
+  C4 --> D
+  D --> E["Speech sanitizer"]
+  E --> F["Conversation timeline builder"]
+  F --> G["Overlap + interruption arbitration"]
+  G --> H["Final script.json + script.txt"]
+  H --> I["Dialogue renderer (ElevenLabs)"]
+  I --> J["episode-mix.mp3 + publish pipeline"]
+```
+
 ## What is included
 
 - Express backend with:
