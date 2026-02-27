@@ -1,3 +1,7 @@
+> Live production app: https://voice-agent-ruby.vercel.app
+>
+> Direct podcast UI: https://voice-agent-ruby.vercel.app/podcast/
+
 # Voice Agent Starter (Insurance Leads)
 
 This repository provides a production-oriented starter for an insurance lead voice agent using ElevenLabs, with a local harness for behavior and tool-call validation.
