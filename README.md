@@ -2,9 +2,6 @@
 >
 > Direct podcast UI: https://voice-agent-ruby.vercel.app/podcast/
 
-# Voice Agent Starter (Insurance Leads)
-
-This repository provides a production-oriented starter for an insurance lead voice agent using ElevenLabs, with a local harness for behavior and tool-call validation.
 
 ## High-level walkthrough
 
@@ -133,7 +130,3 @@ To publish an episode directory (upload to S3 + upsert to Neon):
 npm run site:migrate
 npm run site:publish-episode -- --episodeDir output/episodes/<episodeId>
 ```
-
-## Legal/compliance note
-
-This repo includes baseline guardrails for sales conversations (for example, DNC handling and non-binding language), but it is not legal advice. Validate scripts and policy rules with counsel before production use.
